@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 
 // Função para converter graus em radianos
 function deg2rad(deg) {
@@ -60,6 +60,24 @@ export default function App() {
     setDistancia(0);
   };
 
+  // Função para mover marcadores e recalcular distância
+  const handleDragEnd = (index, event) => {
+    const { latitude, longitude } = event.nativeEvent.coordinate;
+    const newMarkers = [...markers];
+    newMarkers[index] = { latitude, longitude };
+    setMarkers(newMarkers);
+
+    if (newMarkers.length === 2) {
+      const dist = getDistanceFromLatLonInKm(
+        newMarkers[0].latitude,
+        newMarkers[0].longitude,
+        newMarkers[1].latitude,
+        newMarkers[1].longitude
+      );
+      setDistancia(dist.toFixed(2));
+    }
+  };
+
   return (
     <View style={style.container}>
       <View style={style.mapContainer}>
@@ -89,6 +107,8 @@ export default function App() {
             coordinate={m}
             title={`Marcador ${index + 1}`}
             pinColor={index === 0 ? "blue" : "red"}
+            draggable
+            onDragEnd={(e) => handleDragEnd(index, e)}
           />
         ))}
       </MapView>
