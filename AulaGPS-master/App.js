@@ -31,8 +31,8 @@ export default function App() {
   const handleMapPress = (event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
 
-    // Limita a quantidade de marcadores a 2
-    if (markers.length >= 2) {
+    // Limita a quantidade de marcadores a 3
+    if (markers.length >= 3) {
       Alert.alert("Limite de marcadores atingido", "Clique em limpar");
       return;
     }
@@ -41,15 +41,18 @@ export default function App() {
     const newMarkers = [...markers, { latitude, longitude }];
     setMarkers(newMarkers);
 
-    // Calcula a distância se houver 2 marcadores
-    if (newMarkers.length === 2) {
-      const dist = getDistanceFromLatLogInKm(
-        newMarkers[0].latitude,
-        newMarkers[0].longitude,
-        newMarkers[1].latitude,
-        newMarkers[1].longitude
-      );
-      setDistancia(dist.toFixed(2));
+    // Calcula a distância se houver 2 ou mais marcadores
+    if (newMarkers.length >= 2) {
+      let totalDist = 0;
+      for (let i = 1; i < newMarkers.length; i++) {
+        totalDist += getDistanceFromLatLogInKm(
+          newMarkers[i - 1].latitude,
+          newMarkers[i - 1].longitude,
+          newMarkers[i].latitude,
+          newMarkers[i].longitude
+        );
+      }
+      setDistancia(totalDist.toFixed(2));
     }
   };
 
@@ -66,14 +69,17 @@ export default function App() {
     newMarkers[index] = { latitude, longitude };
     setMarkers(newMarkers);
 
-    if (newMarkers.length === 2) {
-      const dist = getDistanceFromLatLogInKm(
-        newMarkers[0].latitude,
-        newMarkers[0].longitude,
-        newMarkers[1].latitude,
-        newMarkers[1].longitude
-      );
-      setDistancia(dist.toFixed(2));
+    if (newMarkers.length >= 2) {
+      let totalDist = 0;
+      for (let i = 1; i < newMarkers.length; i++) {
+        totalDist += getDistanceFromLatLogInKm(
+          newMarkers[i - 1].latitude,
+          newMarkers[i - 1].longitude,
+          newMarkers[i].latitude,
+          newMarkers[i].longitude
+        );
+      }
+      setDistancia(totalDist.toFixed(2));
     }
   };
 
@@ -81,9 +87,9 @@ export default function App() {
     <View style={style.container}>
       <View style={style.mapContainer}>
         {distancia > 0 ? (
-          <Text style={style.infoText}>Distância Calculada: {distancia} km</Text>
+          <Text style={style.infoText}>Distância Total: {distancia} km</Text>
         ) : (
-          <Text style={style.infoText}>Toque em dois pontos no mapa para calcular a distância</Text>
+          <Text style={style.infoText}>Toque em até três pontos no mapa para calcular a distância</Text>
         )}
         <TouchableOpacity style={style.button} onPress={handleClear}>
           <Text style={style.buttonText}>Limpar</Text>
@@ -99,7 +105,7 @@ export default function App() {
           longitudeDelta: 0.05
         }}
       >
-        {markers.length === 2 && (
+        {markers.length >= 2 && (
           <Polyline coordinates={markers} strokeColor="blue" />
         )}
 
@@ -109,7 +115,7 @@ export default function App() {
             key={index}
             coordinate={m}
             title={`Marcador ${index + 1}`}
-            pinColor={index === 0 ? "blue" : "red"}
+            pinColor={["blue", "red", "green"][index] || "blue"}
             draggable
             onDragEnd={(e) => handleDragEnd(index, e)}
           />
