@@ -8,7 +8,7 @@ function deg2rad(deg) {
 }
 
 // Função para calcular a distância entre dois pontos geográficos
-function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+function getDistanceFromLatLogInKm(lat1, lon1, lat2, lon2) {
   const R = 6371; // Raio da Terra em km
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
@@ -16,9 +16,8 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const d = R * c; // Distância em km
-  return d;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+  return R * c;
 }
 
 // Componente principal do app
@@ -44,7 +43,7 @@ export default function App() {
 
     // Calcula a distância se houver 2 marcadores
     if (newMarkers.length === 2) {
-      const dist = getDistanceFromLatLonInKm(
+      const dist = getDistanceFromLatLogInKm(
         newMarkers[0].latitude,
         newMarkers[0].longitude,
         newMarkers[1].latitude,
@@ -68,7 +67,7 @@ export default function App() {
     setMarkers(newMarkers);
 
     if (newMarkers.length === 2) {
-      const dist = getDistanceFromLatLonInKm(
+      const dist = getDistanceFromLatLogInKm(
         newMarkers[0].latitude,
         newMarkers[0].longitude,
         newMarkers[1].latitude,
@@ -100,6 +99,10 @@ export default function App() {
           longitudeDelta: 0.05
         }}
       >
+        {markers.length === 2 && (
+          <Polyline coordinates={markers} strokeColor="blue" />
+        )}
+
         {/* Renderizar marcadores */}
         {markers.map((m, index) => (
           <Marker
