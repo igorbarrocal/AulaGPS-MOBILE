@@ -42,11 +42,6 @@ Este projeto é um aplicativo React Native que permite ao usuário marcar dois p
    ```bash
    expo start
    ```
-
-## Imagem de exemplo
-
-![Exemplo do app](docs/screenshot.png)
-
 ## Estrutura do código
 
 - `App.js`: Componente principal, lógica dos marcadores e cálculo de distância.
